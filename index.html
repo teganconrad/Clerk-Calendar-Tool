@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clerk Calendar Tool | Home</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script type="module" defer src="assets/js/main.js"></script>
+  </head>
+  <body data-page="home">
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="index.html">Clerk Calendar Tool</a>
+        <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <nav class="site-nav" id="site-nav">
+          <a href="index.html" class="active" data-auth="all">Home</a>
+          <a href="about.html" data-auth="all">About</a>
+          <a href="contact.html" data-auth="all">Contact</a>
+          <a href="calendar.html" data-auth="user" class="is-hidden">Calendar</a>
+          <a href="admin.html" data-auth="admin" class="is-hidden">Admin Dashboard</a>
+          <a href="login.html" data-auth="guest">Login</a>
+          <a href="register.html" data-auth="guest">Register</a>
+          <button class="link-btn is-hidden" data-auth="user" data-action="logout" type="button">Logout</button>
+          <span class="user-badge is-hidden" id="user-badge" data-auth="user">Guest</span>
+          <button id="theme-toggle" class="theme-toggle" type="button">Light Mode</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <h1>School district calendar and operations portal.</h1>
+        <p>
+          Manage deadlines, meetings, and compliance milestones in one secure place. This Phase 1
+          release includes authentication and protected access scaffolding.
+        </p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="register.html">Create Account</a>
+          <a class="btn-secondary" href="login.html">Sign In</a>
+        </div>
+      </section>
+
+      <section class="container cards-grid">
+        <article class="card">
+          <h2>Protected Access</h2>
+          <p>Calendar and Admin routes are gated by Supabase session and profile role checks.</p>
+        </article>
+        <article class="card">
+          <h2>Role-Based Foundation</h2>
+          <p>Profiles support user and admin roles for future governance and workflow tooling.</p>
+        </article>
+        <article class="card">
+          <h2>Next-Phase Ready</h2>
+          <p>Structure is prepared for FullCalendar, storage, and district-level admin tools.</p>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Clerk Calendar Tool</p>
+      </div>
+    </footer>
+  </body>
+</html>

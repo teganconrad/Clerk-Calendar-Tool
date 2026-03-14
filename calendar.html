@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clerk Calendar Tool | Calendar</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script type="module" defer src="assets/js/main.js"></script>
+  </head>
+  <body data-page="calendar">
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="index.html">Clerk Calendar Tool</a>
+        <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <nav class="site-nav" id="site-nav">
+          <a href="index.html" data-auth="all">Home</a>
+          <a href="about.html" data-auth="all">About</a>
+          <a href="contact.html" data-auth="all">Contact</a>
+          <a href="calendar.html" class="active is-hidden" data-auth="user">Calendar</a>
+          <a href="admin.html" data-auth="admin" class="is-hidden">Admin Dashboard</a>
+          <a href="login.html" data-auth="guest">Login</a>
+          <a href="register.html" data-auth="guest">Register</a>
+          <button class="link-btn is-hidden" data-auth="user" data-action="logout" type="button">Logout</button>
+          <span class="user-badge is-hidden" id="user-badge" data-auth="user">Guest</span>
+          <button id="theme-toggle" class="theme-toggle" type="button">Light Mode</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-block">
+      <h1>Calendar (Protected Placeholder)</h1>
+      <p>This page is accessible to logged-in users only.</p>
+      <div class="card">
+        <p>
+          Calendar functionality has not been built yet in this phase. In the next phase, this
+          area will host FullCalendar with district events and deadlines.
+        </p>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Clerk Calendar Tool</p>
+      </div>
+    </footer>
+  </body>
+</html>

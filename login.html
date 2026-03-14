@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clerk Calendar Tool | Login</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script type="module" defer src="assets/js/main.js"></script>
+  </head>
+  <body data-page="login">
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="index.html">Clerk Calendar Tool</a>
+        <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <nav class="site-nav" id="site-nav">
+          <a href="index.html" data-auth="all">Home</a>
+          <a href="about.html" data-auth="all">About</a>
+          <a href="contact.html" data-auth="all">Contact</a>
+          <a href="calendar.html" data-auth="user" class="is-hidden">Calendar</a>
+          <a href="admin.html" data-auth="admin" class="is-hidden">Admin Dashboard</a>
+          <a href="login.html" class="active" data-auth="guest">Login</a>
+          <a href="register.html" data-auth="guest">Register</a>
+          <button class="link-btn is-hidden" data-auth="user" data-action="logout" type="button">Logout</button>
+          <span class="user-badge is-hidden" id="user-badge" data-auth="user">Guest</span>
+          <button id="theme-toggle" class="theme-toggle" type="button">Light Mode</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-block narrow">
+      <h1>Login</h1>
+      <p>Use your district account credentials to sign in.</p>
+
+      <form id="login-form" class="auth-form">
+        <label for="login-email">Email</label>
+        <input id="login-email" name="email" type="email" required />
+
+        <label for="login-password">Password</label>
+        <input id="login-password" name="password" type="password" required />
+
+        <button type="submit" class="btn-primary">Sign In</button>
+        <button type="button" id="login-google-btn" class="btn-secondary">Sign In with Google</button>
+        <button type="button" id="forgot-password-btn" class="link-btn">Forgot Password</button>
+      </form>
+
+      <p id="login-alert" class="alert" aria-live="polite"></p>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Clerk Calendar Tool</p>
+      </div>
+    </footer>
+  </body>
+</html>
