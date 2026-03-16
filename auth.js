@@ -1,69 +1,166 @@
-import {
-  applyNavigationAuthState,
-  initLoginForm,
-  initLogoutActions,
-  initRegisterForm,
-  protectPage,
-} from './auth.js';
+import { supabase, hasSupabaseKeys } from './supabase-config.js';
 
-const THEME_KEY = 'clerk-calendar-theme';
+function getEmailFromUser(user) {
+  return user?.email || user?.user_metadata?.email || 'Guest';
+}
 
-const setTheme = (theme) => {
-  document.documentElement.setAttribute('data-theme', theme);
-  const toggle = document.getElementById('theme-toggle');
-  if (toggle) {
-    toggle.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+export async function applyNavigationAuthState() {
+  const userBadge = document.getElementById('user-badge');
+  const guestEls = document.querySelectorAll('[data-auth="guest"]');
+  const userEls = document.querySelectorAll('[data-auth="user"]');
+  const adminEls = document.querySelectorAll('[data-auth="admin"]');
+
+  if (!hasSupabaseKeys || !supabase) {
+    if (userBadge) userBadge.textContent = 'Guest';
+    guestEls.forEach((el) => el.classList.remove('is-hidden'));
+    userEls.forEach((el) => el.classList.add('is-hidden'));
+    adminEls.forEach((el) => el.classList.add('is-hidden'));
+    return;
   }
-  localStorage.setItem(THEME_KEY, theme);
-};
 
-const initializeTheme = () => {
-  const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
-  setTheme(savedTheme);
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
 
-  document.getElementById('theme-toggle')?.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    setTheme(current === 'dark' ? 'light' : 'dark');
+  if (error || !session?.user) {
+    if (userBadge) userBadge.textContent = 'Guest';
+    guestEls.forEach((el) => el.classList.remove('is-hidden'));
+    userEls.forEach((el) => el.classList.add('is-hidden'));
+    adminEls.forEach((el) => el.classList.add('is-hidden'));
+    return;
+  }
+
+  const user = session.user;
+
+  guestEls.forEach((el) => el.classList.add('is-hidden'));
+  userEls.forEach((el) => el.classList.remove('is-hidden'));
+
+  if (userBadge) {
+    userBadge.textContent = getEmailFromUser(user);
+  }
+
+  const role = user.user_metadata?.role;
+
+  if (role === 'admin') {
+    adminEls.forEach((el) => el.classList.remove('is-hidden'));
+  } else {
+    adminEls.forEach((el) => el.classList.add('is-hidden'));
+  }
+}
+
+export function initLoginForm() {
+  const form = document.getElementById('login-form');
+  if (!form) return;
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (!hasSupabaseKeys || !supabase) {
+      alert('Supabase is not configured yet.');
+      return;
+    }
+
+    const email = form.email.value.trim();
+    const password = form.password.value;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    window.location.href = 'calendar.html';
   });
-};
+}
 
-const initializeMenu = () => {
-  const menuToggle = document.querySelector('.menu-toggle');
-  const nav = document.getElementById('site-nav');
-  if (!menuToggle || !nav) return;
+export function initRegisterForm() {
+  const form = document.getElementById('register-form');
+  if (!form) return;
 
-  menuToggle.addEventListener('click', () => {
-    const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
-    menuToggle.setAttribute('aria-expanded', String(!expanded));
-    nav.classList.toggle('open');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    if (!hasSupabaseKeys || !supabase) {
+      alert('Supabase is not configured yet.');
+      return;
+    }
+
+    const email = form.email.value.trim();
+    const password = form.password.value;
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert('Account created. Check your email if confirmation is enabled.');
+    window.location.href = 'login.html';
   });
-};
+}
 
-const initializeFooterYear = () => {
-  const yearEl = document.getElementById('year');
-  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-};
+export function initLogoutActions() {
+  const logoutButtons = document.querySelectorAll('[data-action="logout"]');
+  if (!logoutButtons.length) return;
 
-const init = async () => {
-  initializeTheme();
-  initializeMenu();
-  initializeFooterYear();
-  initLogoutActions();
+  logoutButtons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+      window.location.href = 'index.html';
+    });
+  });
+}
 
-  const page = document.body.dataset.page;
+export async function protectPage(options = {}) {
+  const { requiresAuth = false, requiresAdmin = false } = options;
 
-  await applyNavigationAuthState();
+  if (!requiresAuth) return true;
 
-  if (page === 'login') initLoginForm();
-  if (page === 'register') initRegisterForm();
-
-  if (page === 'calendar') {
-    await protectPage({ requiresAuth: true });
+  if (!hasSupabaseKeys || !supabase) {
+    window.location.href = 'login.html';
+    return false;
   }
 
-  if (page === 'admin') {
-    await protectPage({ requiresAuth: true, requiresAdmin: true });
-  }
-};
+  const { data, error } = await supabase.auth.getUser();
 
-init();
+  if (error || !data?.user) {
+    window.location.href = 'login.html';
+    return false;
+  }
+
+  if (requiresAdmin) {
+    const role = data.user.user_metadata?.role;
+    if (role !== 'admin') {
+      window.location.href = 'calendar.html';
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export async function getSession() {
+  if (!hasSupabaseKeys || !supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error('Session error:', error);
+    return null;
+  }
+
+  return data.session;
+}

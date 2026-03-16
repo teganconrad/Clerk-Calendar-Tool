@@ -5,14 +5,9 @@ import {
   initRegisterForm,
   protectPage,
 } from './auth.js';
-
-document.addEventListener('DOMContentLoaded', async () => {
-  await applyNavigationAuthState();
-  initLoginForm();
-  initRegisterForm();
-  initLogoutActions();
-  protectPage();
-});
+import { initCalendarPage } from './calendar.js';
+import { initHomeWeeklyWidget } from './home-widget.js';
+import { initSearchResultsPage } from './search-results.js';
 
 const THEME_KEY = 'clerk-calendar-theme';
 
@@ -67,10 +62,20 @@ const init = async () => {
 
   if (page === 'calendar') {
     await protectPage({ requiresAuth: true });
+    await initCalendarPage();
+  }
+
+  if (page === 'search-results') {
+    await protectPage({ requiresAuth: true });
+    await initSearchResultsPage();
   }
 
   if (page === 'admin') {
     await protectPage({ requiresAuth: true, requiresAdmin: true });
+  }
+
+  if (page === 'home') {
+    await initHomeWeeklyWidget();
   }
 };
 
