@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clerk Calendar Tool | Home</title>
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <script type="module" defer src="assets/js/main.js"></script>
+   <link rel="stylesheet" href="../assets/css/styles.css" />
+   <script type="module" defer src="../assets/js/main.js"></script>
   </head>
   <body data-page="home">
     <header class="site-header">
@@ -31,28 +31,53 @@
       <section class="hero container">
         <h1>School district calendar and operations portal.</h1>
         <p>
-          Manage deadlines, meetings, and compliance milestones in one secure place. This Phase 1
-          release includes authentication and protected access scaffolding.
+          Manage deadlines, meetings, and compliance milestones in one secure place.
+          This phase includes full authenticated calendar CRUD.
         </p>
         <div class="hero-actions">
-          <a class="btn-primary" href="register.html">Create Account</a>
-          <a class="btn-secondary" href="login.html">Sign In</a>
+       <a href="calendar.html" class="btn-primary" data-auth="user">Open Calendar</a>
+       <a href="login.html" class="btn-secondary" data-auth="guest">Sign In</a>
         </div>
+      </section>
+
+      <section class="container summary-grid" id="home-summary-grid" data-auth="user">
+        <article class="card summary-card">
+          <h3>Upcoming Events</h3>
+          <p id="summary-upcoming" class="summary-value">--</p>
+        </article>
+        <article class="card summary-card">
+          <h3>Due This Week</h3>
+          <p id="summary-week" class="summary-value">--</p>
+        </article>
+        <article class="card summary-card">
+          <h3>With Reminders</h3>
+          <p id="summary-reminders" class="summary-value">--</p>
+        </article>
+        <article class="card summary-card">
+          <h3>Next Deadline</h3>
+          <p id="summary-next" class="summary-value">--</p>
+        </article>
       </section>
 
       <section class="container cards-grid">
         <article class="card">
-          <h2>Protected Access</h2>
-          <p>Calendar and Admin routes are gated by Supabase session and profile role checks.</p>
+          <h2>Personal Event Security</h2>
+          <p>Each user can only access their own events using Supabase row-level policies.</p>
         </article>
         <article class="card">
-          <h2>Role-Based Foundation</h2>
-          <p>Profiles support user and admin roles for future governance and workflow tooling.</p>
+          <h2>Monthly to Daily Planning</h2>
+          <p>Calendar supports month, week, and day views for district workflow management.</p>
         </article>
         <article class="card">
-          <h2>Next-Phase Ready</h2>
-          <p>Structure is prepared for FullCalendar, storage, and district-level admin tools.</p>
+          <h2>Future Expansion Ready</h2>
+          <p>Data model includes scaffolding for recurrence, reminders, attachments, and imports.</p>
         </article>
+      </section>
+
+      <section class="container card weekly-widget">
+        <h2>This Week</h2>
+        <p id="mini-weekly-status" class="muted">Loading weekly events…</p>
+        <div id="mini-weekly-events" class="mini-weekly-grid"></div>
       </section>
     </main>
 

@@ -4,8 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clerk Calendar Tool | Calendar</title>
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <script type="module" defer src="assets/js/main.js"></script>
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+    <script type="module" defer src="../assets/js/main.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+   
   </head>
   <body data-page="calendar">
     <header class="site-header">
@@ -28,13 +32,175 @@
     </header>
 
     <main class="container page-block">
-      <h1>Calendar (Protected Placeholder)</h1>
-      <p>This page is accessible to logged-in users only.</p>
-      <div class="card">
-        <p>
-          Calendar functionality has not been built yet in this phase. In the next phase, this
-          area will host FullCalendar with district events and deadlines.
+      <section class="calendar-toolbar">
+        <div>
+          <h1>Calendar</h1>
+          <p>Drag to move events. Resize in week/day view to update event end times.</p>
+        </div>
+        <div class="filter-row">
+          <div class="filter-wrap">
+            <label for="category-filter">Filter by category</label>
+            <select id="category-filter"></select>
+          </div>
+          <div class="filter-wrap">
+            <label for="event-search-input">Search events</label>
+            <div class="search-box">
+              <input id="event-search-input" type="text" placeholder="Search title, description, category" />
+              <button id="search-events-btn" type="button" class="btn-primary">Search</button>
+              <button id="clear-search-btn" type="button" class="btn-secondary">Clear</button>
+</div>
+           
+          </div>
+        </div>
+      </section>
+
+      <p id="calendar-loading" class="muted">Loading events…</p>
+      <p id="calendar-error" class="alert error is-hidden"></p>
+      <p id="calendar-empty" class="muted is-hidden">No events found for this filter.</p>
+      <p id="calendar-status" class="alert" aria-live="polite"></p>
+
+      <div id="category-legend" class="legend"></div>
+      <div id="calendar-root" class="calendar-shell"></div>
+
+      <section class="dashboard-grid">
+        <article class="import-card card">
+          <h2>Upcoming Reminders</h2>
+          <div id="upcoming-reminders"></div>
+        </article>
+      </section>
+
+      <section class="import-card card">
+        <div class="import-header">
+          <h2>Excel Import</h2>
+          <button type="button" id="download-template-btn" class="btn-secondary">Download Template (.xlsx)</button>
+        </div>
+        <p class="muted">
+          Upload an Excel file, preview rows, validate, and then import valid events to your account only.
         </p>
+
+        <div class="import-controls">
+          <input id="excel-file-input" type="file" accept=".xlsx" />
+          <button type="button" id="parse-excel-btn" class="btn-secondary">Parse & Preview</button>
+          <button type="button" id="confirm-import-btn" class="btn-primary" disabled>Confirm Import</button>
+        </div>
+
+        <p id="import-summary" class="muted">Rows parsed: 0. Added: 0. Duplicates skipped: 0. Invalid skipped: 0.</p>
+        <p id="import-feedback" class="alert" aria-live="polite"></p>
+
+        <div class="table-wrap">
+          <table class="import-table">
+            <thead>
+              <tr>
+                <th>Row</th>
+                <th>Title</th>
+                <th>Due Date</th>
+                <th>Category</th>
+                <th>Reminder</th>
+                <th>Status / Validation</th>
+              </tr>
+            </thead>
+            <tbody id="import-preview-body">
+              <tr>
+                <td colspan="6" class="muted">No rows parsed yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="muted small-note">
+          Duplicate protection: events with the same title + due date already in your calendar (or repeated in file)
+          are marked as duplicates and skipped.
+        </p>
+      </section>
+
+      <section class="import-card card">
+        <h2>Import History</h2>
+        <div class="table-wrap">
+          <table class="import-table">
+            <thead>
+              <tr>
+                <th>Imported At</th>
+                <th>File</th>
+                <th>Total Rows</th>
+                <th>Added</th>
+                <th>Duplicates</th>
+                <th>Invalid</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="import-history-body">
+              <tr>
+                <td colspan="7" class="muted">Loading import history…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div id="event-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="event-modal-title">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2 id="event-modal-title">Create Event</h2>
+            <button id="event-close-btn" class="link-btn" type="button">Close</button>
+          </div>
+
+          <form id="event-form" class="auth-form">
+            <label for="event-title">Title</label>
+            <input id="event-title" type="text" required maxlength="120" />
+
+            <label for="event-due-date">Start date & time</label>
+            <input id="event-due-date" type="datetime-local" required />
+
+            <label for="event-end-date">End date & time (optional, used for resize support)</label>
+            <input id="event-end-date" type="datetime-local" />
+
+            <label for="event-description">Description</label>
+            <textarea id="event-description" rows="3"></textarea>
+
+            <label for="event-category">Category</label>
+            <select id="event-category"></select>
+
+            <label for="event-color">Color</label>
+            <input id="event-color" type="color" value="#64748b" />
+
+            <label for="event-recurrence-preset">Recurrence</label>
+            <select id="event-recurrence-preset">
+              <option value="none">None</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="custom">Advanced/custom</option>
+            </select>
+            <small id="recurrence-hint" class="muted">This event occurs once.</small>
+
+            <label for="event-recurrence-advanced">Advanced recurrence rule (optional)</label>
+            <input id="event-recurrence-advanced" type="text" placeholder="e.g., FREQ=WEEKLY" />
+
+            <label for="event-reminder-type">Reminder type</label>
+            <select id="event-reminder-type">
+              <option value="none">None</option>
+              <option value="in_app">In-app</option>
+              <option value="email">Email</option>
+            </select>
+
+            <label for="event-reminder-datetime">Reminder date/time</label>
+            <input id="event-reminder-datetime" type="datetime-local" />
+
+            <label for="event-attachment">Attachment (scaffold, one file per event)</label>
+            <input id="event-attachment" type="file" accept=".pdf,.xlsx,.xls,.doc,.docx" />
+            <div id="attachment-current"></div>
+
+            <div class="modal-actions">
+              <button id="event-save-btn" type="submit" class="btn-primary">Save Event</button>
+              <button id="event-delete-btn" type="button" class="btn-danger is-hidden">Delete Event</button>
+              <button id="event-cancel-btn" type="button" class="btn-secondary">Cancel</button>
+            </div>
+          </form>
+
+          <p class="muted small-note">
+            Recurrence currently expands in the UI from one source row. Per-occurrence exceptions are planned for a future phase.
+          </p>
+        </div>
       </div>
     </main>
 

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clerk Calendar Tool | Search Results</title>
+    <link rel="stylesheet" href="../assets/css/styles.css" />
+    <script type="module" defer src="../assets/js/main.js"></script>
+    <script type="module" defer src="../assets/js/search-results.js"></script>
+</head>
+  <body data-page="search-results">
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="index.html">Clerk Calendar Tool</a>
+        <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <nav class="site-nav" id="site-nav">
+          <a href="index.html" data-auth="all">Home</a>
+          <a href="about.html" data-auth="all">About</a>
+          <a href="contact.html" data-auth="all">Contact</a>
+          <a href="calendar.html" data-auth="user" class="is-hidden">Calendar</a>
+          <a href="admin.html" data-auth="admin" class="is-hidden">Admin Dashboard</a>
+          <a href="login.html" data-auth="guest">Login</a>
+          <a href="register.html" data-auth="guest">Register</a>
+          <button class="link-btn is-hidden" data-auth="user" data-action="logout" type="button">Logout</button>
+          <span class="user-badge is-hidden" id="user-badge" data-auth="user">Guest</span>
+          <button id="theme-toggle" class="theme-toggle" type="button">Light Mode</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container page-block">
+      <section class="search-results-header">
+        <div>
+          <h1>Search Results</h1>
+          <p id="search-results-summary" class="muted">Loading search results…</p>
+        </div>
+        <a class="btn-secondary" href="calendar.html">Back to Calendar</a>
+      </section>
+
+      <section class="search-results-controls card">
+        <div class="filter-row">
+  <div class="filter-wrap">
+    <label for="search-query-input">Search</label>
+    <div class="search-box">
+      <input id="search-query-input" type="text" placeholder="Search title, description, category" />
+      <button id="search-query-btn" type="button" class="btn-secondary">Search</button>
+    </div>
+  </div>
+
+  <div class="filter-wrap">
+    <label for="results-sort-filter">Sort / Filter</label>
+    <select id="results-sort-filter">
+      <option value="all">All Results</option>
+      <option value="deadline">Deadline</option>
+      <option value="meeting">Meeting</option>
+      <option value="reporting">Reporting</option>
+      <option value="finance">Finance</option>
+      <option value="operations">Operations</option>
+      <option value="other">Other</option>
+      <option value="date-asc">Date: Soonest to Latest</option>
+      <option value="date-desc">Date: Latest to Soonest</option>
+    </select>
+  </div>
+</div>
+
+        <p id="search-results-count" class="muted">0 result(s)</p>
+      </section>
+
+      <section id="search-results-list" class="search-results-list"></section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Clerk Calendar Tool</p>
+      </div>
+    </footer>
+  </body>
+</html>
